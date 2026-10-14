@@ -74,7 +74,4 @@ def tokenize(text):
         if newg:
             word_dict=merge(word_dict,newg[0],vocab)
         print(vocab)
-
-if __name__=="__main__":
-    text = input("Enter text:")
-    tokenize(text)
+    
