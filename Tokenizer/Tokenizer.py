@@ -51,7 +51,7 @@ def merge(word_dict,best_pair,vocab):
         new_word_dict[tuple(new_word)]=word_count
     return new_word_dict
 
-def tokenize(text):
+def tokenize(text,ittretion=21):
     word_dict={}
     word_c(text,word_dict)
     base_chars=set()
@@ -62,9 +62,9 @@ def tokenize(text):
     for word_tuple in word_dict.keys():
         base_chars.add(word_tuple[-1])
     vocab=sorted(list(base_chars))
-    print(vocab)
 
-    for i in range(21):
+    all_merge=[]
+    for i in range(ittretion):
         frequencies={}
         frequency(word_dict,frequencies)
         if not frequencies:
@@ -72,6 +72,6 @@ def tokenize(text):
         newg=[]
         pair(frequencies,newg)
         if newg:
+            all_merge.append(newg[0])
             word_dict=merge(word_dict,newg[0],vocab)
-        print(vocab)
-    
+    return vocab,all_merge
