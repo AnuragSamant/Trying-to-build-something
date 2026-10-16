@@ -86,6 +86,8 @@ def tokenize(text,ittretion=150):
     for word_tuple in word_dict.keys():
         base_chars.add(word_tuple[-1])
     vocab=sorted(list(base_chars))
+    if("<unk>" not in vocab):
+        vocab.insert(0,"<unk>")
     all_merge=[]
     for i in range(ittretion):
         frequencies={}
