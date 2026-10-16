@@ -27,6 +27,8 @@ try:
             print("Issue with file creation.")
             exit()
         resu=Tokenizer.main()
+        res=resu[0]
+        amer=resu[1]
     else:
         resu=Tokenizer.load_tokenizer()
         if(resu):
