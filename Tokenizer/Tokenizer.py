@@ -71,7 +71,7 @@ def load_tokenizer(filename="training.json"):
         all_merge=[tuple(pair) for pair in data["all_merge"]]
         vocab=data["vocab"]
         print(f"Data loaded successfully from {filename}!")
-        return vocab, all_merge
+        return vocab,all_merge
     else:
         print("Training data not exists.")
 
@@ -99,7 +99,7 @@ def tokenize(text,ittretion=150):
         if newg:
             all_merge.append(newg[0])
             word_dict=merge(word_dict,newg[0],vocab)
-    save_tokenizer(vocab, all_merge, filename="training.json")
+    save_tokenizer(vocab,all_merge,filename="training.json")
     return vocab,all_merge
 
 def main():
