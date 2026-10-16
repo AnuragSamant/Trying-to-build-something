@@ -8,9 +8,10 @@ def tokenid(ids,deco,res):
         j+=1
 
 def encode_text(amer,res,deco):
-    newd = input("Enter data to check:")
-    words = newd.split()
+    newd=input("Enter data to check:")
+    words=newd.split()
     encid=[]
+    unk_id=deco.get("<unk>", 0)
     for w in words:
         singled={}
         charl=list(w)
@@ -24,7 +25,7 @@ def encode_text(amer,res,deco):
                 if k in deco:
                     encid.append(deco[k])
                 else:
-                    pass
+                    encid.append(unk_id)
     return encid
 
 def encoding(res,amer):
