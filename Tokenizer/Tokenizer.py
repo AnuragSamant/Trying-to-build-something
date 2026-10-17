@@ -1,3 +1,5 @@
+#================================================Tokenizer============================================
+#=======================================Vocab creation and saving===========================================
 import json
 
 def word_c(text, count):
@@ -112,3 +114,85 @@ def main():
         return tokenize(text,num)
     else:
         return tokenize(text)
+
+#=======================================Encoding and embeding of data===========================================
+def tokenid(ids,deco,res):
+    j=0
+    for i in res:
+        ids[j]=i
+        deco[i]=j
+        j+=1
+
+def encode_text(amer,res,deco):
+    newd=input("Enter data to check:")
+    words=newd.split()
+    encid=[]
+    unk_id=deco.get("<unk>", 0)
+    for w in words:
+        singled={}
+        charl=list(w)
+        charl[-1]=charl[-1]+"</w>"
+        wt=tuple(charl)
+        singled[wt]=1
+        for i in amer:
+            singled=merge(singled,i,res)
+        for j in singled.keys():
+            for k in j:
+                if k in deco:
+                    encid.append(deco[k])
+                else:
+                    encid.append(unk_id)
+    return encid
+
+def encoding(res,amer):
+    ids=[None]*(len(res))
+    deco={}
+    tokenid(ids,deco,res)
+    encode=encode_text(amer,res,deco)
+    print(encode)
+    return encode,deco
+
+#========================================Decoder of embeddings==========================================
+def decoder(code,dictio):
+    id_to_token={value: key for key, value in dictio.items()}
+    dencr=[]
+    for i in code:
+        token=id_to_token.get(i,"")
+        if(token.endswith("</w>")):
+            clean_token = token.replace("</w>"," ")
+            dencr.append(clean_token)
+        else:
+            dencr.append(token)
+    final_text="".join(dencr)
+    print(final_text)
+
+try:
+    choi=input("Want to add new data to train Y/N ?:")
+    if(choi.casefold()=="y" or choi.casefold()=="yes"):
+        try:
+            with open("data.txt","+a",encoding="utf-8") as f:
+                new_da=input("Enter new data:")
+                wri=" "+new_da
+                f.write(wri)
+                f.close()
+        except Exception as e:
+            print("Issue with file creation.")
+            exit()
+        resu=main()
+        res=resu[0]
+        amer=resu[1]
+    else:
+        resu=load_tokenizer()
+        if(resu):
+            res=resu[0]
+            amer=resu[1]
+        else:
+            exit()
+    encode=encoding(res,amer)
+    code=encode[0]
+    dictio=encode[1]
+    decoder(code,dictio)
+except Exception as e:
+    print("Something Went wrong.")
+#==================================================================================
+#==================================================================================

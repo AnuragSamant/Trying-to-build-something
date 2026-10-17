@@ -1,5 +1,7 @@
 {
     "vocab": [
+        "<unk>",
+        "A",
         "a",
         "c",
         "e",
@@ -36,6 +38,11 @@
         "learner",
         "learner</w>",
         "learners</w>",
+        "An",
+        "Anu",
+        "Anur",
+        "Anura",
+        "Anurag</w>",
         "el",
         "er</w>",
         "ell",
@@ -117,6 +124,26 @@
         [
             "learner",
             "s</w>"
+        ],
+        [
+            "A",
+            "n"
+        ],
+        [
+            "An",
+            "u"
+        ],
+        [
+            "Anu",
+            "r"
+        ],
+        [
+            "Anur",
+            "a"
+        ],
+        [
+            "Anura",
+            "g</w>"
         ],
         [
             "e",
