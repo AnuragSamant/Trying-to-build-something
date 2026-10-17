@@ -34,13 +34,13 @@ def merge(word_dict,best_pair,vocab):
     if("</w>" in first):
         # Standard BPE mein aamtaur par word ke bich mein </w> nahi aata, 
         # par agar first mein hai, toh use clean karein
-        combined=first.replace("</w>", "")+second
+        combined=first.replace("</w>", "")+","+second
     elif("</w>" in second):
         # Agar second token mein </w> hai (jaise 'g</w>'), toh use naye word ke end mein shift karein
-        combined=first+second.replace("</w>", "")+"</w>"
+        combined=first+","+second.replace("</w>", "")+"</w>"
     else:
         # Normal characters ke liye normal merge
-        combined=first+second
+        combined=first+","+second
     if(combined not in vocab):
         vocab.append(combined)
     new_word_dict={}
@@ -78,7 +78,7 @@ def load_tokenizer(filename="training.json"):
     else:
         print("Training data not exists.")
 
-def tokenize(text,ittretion=150):
+def tokenize(text,ittretion=1500):
     word_dict={}
     word_c(text,word_dict)
     base_chars=set()
@@ -157,19 +157,25 @@ def decoder(code,dictio):
     dencr=[]
     byte_accumulator=[]
     for i in code:
-        token=id_to_token.get(i,"")
-        if(token.endswith("</w>")):
-            clean_token=token.replace("</w>"," ")
-            if(clean_token.isdigit()):
-                byte_accumulator.append(int(clean_token))
-            decoded_word=bytes(byte_accumulator).decode("utf-8",errors="replace")+" "
+        token=id_to_token.get(i, "")
+        if(token=="<unk>"):
+            if(byte_accumulator):
+                dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace"))
+                byte_accumulator=[]
+            dencr.append("<unk>")
+            continue
+        is_end=token.endswith("</w>")
+        clean_token=token.replace("</w>","")
+        parts=clean_token.split(",")
+        for p in parts:
+            if(p.isdigit()):
+                byte_accumulator.append(int(p))
+        if(is_end):
+            decoded_word=bytes(byte_accumulator).decode("utf-8", errors="replace")+" "
             dencr.append(decoded_word)
             byte_accumulator=[]
-        else:
-            if(token.isdigit()):
-                byte_accumulator.append(int(token))         
     if(byte_accumulator):
-        dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace"))    
+        dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace"))
     final_text="".join(dencr).strip()
     print(final_text)
 
@@ -205,6 +211,7 @@ try:
     dictio=encode[1]
     decoder(code,dictio)
 except Exception as e:
+    print(e)
     print("Something Went wrong.")
 #==================================================================================
 #==================================================================================
