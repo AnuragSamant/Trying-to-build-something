@@ -104,7 +104,7 @@ def tokenize(text,ittretion=150):
     save_tokenizer(vocab,all_merge,filename="training.json")
     return vocab,all_merge
 
-def main():
+def main_f_t():
     with open("data.txt","r",encoding="utf-8") as f:
         text=f.read()
         f.close()
@@ -178,7 +178,7 @@ try:
         except Exception as e:
             print("Issue with file creation.")
             exit()
-        resu=main()
+        resu=main_f_t()
         res=resu[0]
         amer=resu[1]
     else:
