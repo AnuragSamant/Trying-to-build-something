@@ -5,10 +5,12 @@ import json
 def word_c(text, count):
     words=text.split()
     for i in words:
-        char_list=list(i)
-        char_list[-1]=char_list[-1]+"</w>"
-        wt=tuple(char_list)
-        count[wt]=count.get(wt,0)+1
+        byte_list=list(i.encode("utf-8"))
+        if byte_list:
+            byte_list[-1]=str(byte_list[-1])+"</w>"
+            byte_list[:-1]=[str(b) for b in byte_list[:-1]]
+            wt=tuple(byte_list)
+            count[wt]=count.get(wt,0)+1
 
 def frequency(word_dict,frequencies):
     for word_tuple,word_count in word_dict.items():
@@ -80,12 +82,9 @@ def tokenize(text,ittretion=150):
     word_dict={}
     word_c(text,word_dict)
     base_chars=set()
-    words=text.split()
-    for w in words:
-        for char in w:
-            base_chars.add(char)
     for word_tuple in word_dict.keys():
-        base_chars.add(word_tuple[-1])
+        for item in word_tuple:
+            base_chars.add(item)
     vocab=sorted(list(base_chars))
     if("<unk>" not in vocab):
         vocab.insert(0,"<unk>")
@@ -105,10 +104,9 @@ def tokenize(text,ittretion=150):
     return vocab,all_merge
 
 def main_f_t(coi_check=0):
+    with open("data.txt","r",encoding="utf-8") as f:
+        text=f.read()
     if(coi_check==0):
-        with open("data.txt","r",encoding="utf-8") as f:
-            text=f.read()
-            f.close()
         itt=input("Want to increase iteration Y/N ?:")
         if(itt.casefold()=="y" or itt.casefold()=="yes"):
             num=int(input("Enter new iteration:"))
@@ -119,24 +117,22 @@ def main_f_t(coi_check=0):
         return tokenize(text)
 
 #=======================================Encoding and embeding of data===========================================
-def tokenid(ids,deco,res):
-    j=0
-    for i in res:
-        ids[j]=i
+def tokenid(deco,res):
+    for j,i in enumerate(res):
         deco[i]=j
-        j+=1
 
 def encode_text(amer,res,deco):
     newd=input("Enter data to check:")
     words=newd.split()
     encid=[]
-    unk_id=deco.get("<unk>", 0)
     for w in words:
         singled={}
-        charl=list(w)
-        charl[-1]=charl[-1]+"</w>"
-        wt=tuple(charl)
-        singled[wt]=1
+        byte_list=list(w.encode("utf-8"))
+        if byte_list:
+            byte_list[-1]=str(byte_list[-1])+"</w>"
+            byte_list[:-1]=[str(b) for b in byte_list[:-1]]
+            wt=tuple(byte_list)
+            singled[wt]=1
         for i in amer:
             singled=merge(singled,i,res)
         for j in singled.keys():
@@ -144,13 +140,13 @@ def encode_text(amer,res,deco):
                 if k in deco:
                     encid.append(deco[k])
                 else:
-                    encid.append(unk_id)
+                    fallback_byte=str(ord(k[0])) if len(k)>0 else "0"
+                    encid.append(deco.get(fallback_byte,0))
     return encid
 
 def encoding(res,amer):
-    ids=[None]*(len(res))
     deco={}
-    tokenid(ids,deco,res)
+    tokenid(deco,res)
     encode=encode_text(amer,res,deco)
     print(encode)
     return encode,deco
@@ -159,14 +155,22 @@ def encoding(res,amer):
 def decoder(code,dictio):
     id_to_token={value: key for key, value in dictio.items()}
     dencr=[]
+    byte_accumulator=[]
     for i in code:
         token=id_to_token.get(i,"")
         if(token.endswith("</w>")):
-            clean_token = token.replace("</w>"," ")
-            dencr.append(clean_token)
+            clean_token=token.replace("</w>"," ")
+            if(clean_token.isdigit()):
+                byte_accumulator.append(int(clean_token))
+            decoded_word=bytes(byte_accumulator).decode("utf-8",errors="replace")+" "
+            dencr.append(decoded_word)
+            byte_accumulator=[]
         else:
-            dencr.append(token)
-    final_text="".join(dencr)
+            if(token.isdigit()):
+                byte_accumulator.append(int(token))         
+    if(byte_accumulator):
+        dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace"))    
+    final_text="".join(dencr).strip()
     print(final_text)
 
 try:
@@ -179,7 +183,6 @@ try:
                     new_da=input("Enter new data:")
                     wri=" "+new_da
                     f.write(wri)
-                    f.close()
             except Exception as e:
                 print("Issue with file creation.")
                 exit()
