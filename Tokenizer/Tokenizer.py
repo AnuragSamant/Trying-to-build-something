@@ -64,7 +64,6 @@ def save_tokenizer(vocab, all_merge, filename="training.json"):
     }
     with open(filename,"w",encoding="utf-8") as f:
         json.dump(data,f,ensure_ascii=False,indent=4)
-    print(f"Tokenizer vocabulary and merges successfully saved to {filename}!")
 
 def load_tokenizer(filename="training.json"):
     with open(filename,"r",encoding="utf-8") as f:
@@ -102,16 +101,20 @@ def tokenize(text,ittretion=150):
             all_merge.append(newg[0])
             word_dict=merge(word_dict,newg[0],vocab)
     save_tokenizer(vocab,all_merge,filename="training.json")
+    print("Tokenizer vocabulary and merges successfully saved to training.json!")
     return vocab,all_merge
 
-def main_f_t():
-    with open("data.txt","r",encoding="utf-8") as f:
-        text=f.read()
-        f.close()
-    itt=input("Want to increase iteration Y/N ?:")
-    if(itt.casefold()=="y" or itt.casefold()=="yes"):
-        num=int(input("Enter new iteration:"))
-        return tokenize(text,num)
+def main_f_t(coi_check=0):
+    if(coi_check==0):
+        with open("data.txt","r",encoding="utf-8") as f:
+            text=f.read()
+            f.close()
+        itt=input("Want to increase iteration Y/N ?:")
+        if(itt.casefold()=="y" or itt.casefold()=="yes"):
+            num=int(input("Enter new iteration:"))
+            return tokenize(text,num)
+        else:
+            return tokenize(text)
     else:
         return tokenize(text)
 
@@ -167,20 +170,26 @@ def decoder(code,dictio):
     print(final_text)
 
 try:
-    choi=input("Want to add new data to train Y/N ?:")
-    if(choi.casefold()=="y" or choi.casefold()=="yes"):
-        try:
-            with open("data.txt","+a",encoding="utf-8") as f:
-                new_da=input("Enter new data:")
-                wri=" "+new_da
-                f.write(wri)
-                f.close()
-        except Exception as e:
-            print("Issue with file creation.")
-            exit()
-        resu=main_f_t()
-        res=resu[0]
-        amer=resu[1]
+    tra=input("Want to train again Y/N?:")
+    if(tra.casefold()=="y" or tra.casefold()=="yes"):
+        choi=input("Want to add new data maually Y/N ?:")
+        if(choi.casefold()=="y" or choi.casefold()=="yes"):
+            try:
+                with open("data.txt","+a",encoding="utf-8") as f:
+                    new_da=input("Enter new data:")
+                    wri=" "+new_da
+                    f.write(wri)
+                    f.close()
+            except Exception as e:
+                print("Issue with file creation.")
+                exit()
+            resu=main_f_t()
+            res=resu[0]
+            amer=resu[1]
+        else:
+            resu=main_f_t(1)
+            res=resu[0]
+            amer=resu[1]   
     else:
         resu=load_tokenizer()
         if(resu):
