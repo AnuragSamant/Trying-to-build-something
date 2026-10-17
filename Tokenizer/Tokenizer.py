@@ -101,7 +101,7 @@ def tokenize(text,ittretion=150):
             all_merge.append(newg[0])
             word_dict=merge(word_dict,newg[0],vocab)
     save_tokenizer(vocab,all_merge,filename="training.json")
-    print("Tokenizer vocabulary and merges successfully saved to training.json!")
+    print("Tokenizer vocabulary and merges are successfully updated saved to training.json!")
     return vocab,all_merge
 
 def main_f_t(coi_check=0):
