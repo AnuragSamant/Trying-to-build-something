@@ -203,7 +203,7 @@ def user_e(us_enc,eov): #Take user input token id
         ret_embed.append(eov[i]) #Save the token embedding by finding it using token id
     return ret_embed #Return all the fetched embeddings
 
-def weights(eou): #Weight matrix for user input
+def weights(): #Weight matrix for user input
     weight=[] #Empty weights
     for i in range(10): #Row = Number of embedding
         col=[] #Col = Weights
@@ -212,6 +212,54 @@ def weights(eou): #Weight matrix for user input
             col.append(ran_wei) #Add value to each col
         weight.append(col) #Add value to weight
     return weight #Return weight matrix
+
+def sum_layer(eou,initial): #Find the sum of embeddings
+    sum_list=[] #Empty list to save sum
+    embed_count=len(eou) #Count number of user embedding
+    tc=0 #Temprory variable
+    while(tc<embed_count): #Move through each layer of user embedding
+        col_count=[] #Save each column sum in one layer of embedding
+        for j in range(10): #Column Count
+            temp=0 #Find sum of each column
+            for i in range(10): #Row count (Used a col count for user embedding layer)
+                mult=eou[tc][i]*initial[i][j] #Find result of each embedding * weight
+                temp+=mult #Same total sum of one column
+            col_count.append(temp) #Add the total sum of column to list
+        sum_list.append(col_count) #Add all columns sum for layer to list. One embedding layer at a time
+        tc+=1 #Increase row count of embedding
+    return sum_list #return the overall sum of each column for embedding in each layer
+
+def ReLU(sums):
+    h_calc=[] #New Calculated matrix
+    temp=len(sums) #Temprory variable
+    tc=0 ##Temprory count variable
+    while(tc<temp):
+        new=[] #Saving each layer change
+        for i in range(10):
+            if(sums[tc][i]>0): #Check if value greater than 0
+                new.append(sums[tc][i]) #If yes add it
+            else:
+                new.append(0) #If no replace with 0
+        h_calc.append(new) #Add each layer all changed value to main 
+        tc+=1
+    return h_calc #Return new sum matrix      
+
+def add_layer(intial,relu): #Adding multiple layers on top of each other
+    no=int(input("How many hidden layer you want:"))
+    no-=1
+    new_layer_res=relu #Save old layer result
+    weight_history=[]
+    weight_history.append(intial)
+    activation_history=[]
+    activation_history.append(relu)
+    while(no>0):
+        wei=weights() #Make new weights
+        weight_history.append(wei)
+        new_sum_layer=sum_layer(new_layer_res,wei)
+        new_layer_res=ReLU(new_sum_layer)
+        activation_history.append(new_layer_res)
+        no-=1
+    return weight_history, activation_history
 
 try:
     tra=input("Want to train again Y/N?:") #Ask user to train the model vocab again
@@ -248,7 +296,12 @@ try:
     row=(load_tokenizer()) #Load the training file
     eov=matrix(row[0]) #Use Voacabulary to create 2D matrix
     eou=user_e(code,eov) #Fetch needed embedding from all embeddings using token ID
-    intial=weights(eou) #Createing weight matrix
-    print(intial)
+    intial=weights() #Createing weight matrix
+    intial=weights() #Createing weight matrix
+    sums=sum_layer(eou,intial) #Create a column sum matrix for each embedding
+    relu=ReLU(sums)
+    new_layer=add_layer(intial,relu)
+    print(new_layer[1])
 except Exception as e:
+    print(e)
     print("Something Went wrong.")
