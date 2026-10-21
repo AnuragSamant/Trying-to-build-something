@@ -1,0 +1,20 @@
+{
+  "name": "codemind",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n API,VITE -c blue,green \"npm:dev:api\" \"npm:dev:vite\"",
+    "dev:api": "node --watch server/index.js",
+    "dev:vite": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "vite": "^6.0.5"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.8"
+  }
+}
