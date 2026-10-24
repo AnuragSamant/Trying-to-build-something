@@ -104,7 +104,7 @@ def tokenize(text,ittretion=15000):
 
 def main_f_t(coi_check=0): #Main funtion to create a vocab and use it
     try: #Opens the data.txt file to train the vocabulary
-        with open("data.txt","r",encoding="utf-8") as f:
+        with open("C:/Programing/Project/Training/data.txt","r",encoding="utf-8") as f:
             text=f.read()
         if(coi_check==0): #Works if user has choosen to input new data manually
             itt=input("Want to increase iteration Y/N ?:")

@@ -81,7 +81,7 @@ try:
         choi=input("Want to add new data maually Y/N ?:") #Ask if user want to enter new data or he has done it maunually directly to data.txt
         if(choi.casefold()=="y" or choi.casefold()=="yes"):
             try:
-                with open("data.txt","+a",encoding="utf-8") as f:
+                with open("C:/Programing/Project/Training/data.txt","+a",encoding="utf-8") as f:
                     new_da=input("Enter new data:")
                     wri=" "+new_da
                     f.write(wri) #Add new data to file
