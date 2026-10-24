@@ -77,7 +77,7 @@ def load_tokenizer(filename="training.json"): #Load Vocabulary file to Use it
     else:
         print("Training data not exists.")
 
-def tokenize(text,ittretion=1500):
+def tokenize(text,ittretion=15000):
     word_dict={} #Dictionary with count of each word
     word_c(text,word_dict)
     base_chars=set() #Keep only unique characters
