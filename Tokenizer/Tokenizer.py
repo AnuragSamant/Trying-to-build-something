@@ -150,36 +150,34 @@ def encoding(res,amer): #Tokenize vocabulary and user input
     deco={}
     tokenid(deco,res)
     encode=encode_text(amer,res,deco)
-    print(encode)
     return encode,deco
 
 #========================================Decoder of value==========================================
-'''def decoder(code,dictio): #Decode the token id genrated
-    id_to_token={value: key for key, value in dictio.items()} #Reverse the dictionary where all vocabulary is saved with a idex so that index become key
-    dencr=[] #Add Text to list
-    byte_accumulator=[] #Save numbers
-    for i in code:
-        token=id_to_token.get(i,"") #If id exisr return wrod else ""
+def decoder(tokens): # Decode the list of predicted token strings directly
+    dencr=[] # Add text parts to list
+    byte_accumulator=[] # Save byte numbers
+    for token in tokens:
         if(token=="<unk>"):
-            if(byte_accumulator): #Check if there is any number
-                dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace")) #Change number to word
+            if(byte_accumulator):
+                dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace"))
                 byte_accumulator=[]
-            dencr.append("<unk>") #Add <unk> for new word
+            dencr.append("<unk>")
             continue
-        clean_token=token.replace("</w>","")
+        clean_token=token.replace("</w>", "")
         parts=clean_token.split(",")
         for p in parts:
             if(p.isdigit()):
-                byte_accumulator.append(int(p)) #Add int to a list
+                byte_accumulator.append(int(p)) # Add int byte to accumulator
         is_end=token.endswith("</w>")
         if(is_end):
-            decoded_word=bytes(byte_accumulator).decode("utf-8", errors="replace")+" " #Change number to word
-            dencr.append(decoded_word) #Add decoded word
+            decoded_word=bytes(byte_accumulator).decode("utf-8", errors="replace") + " "
+            dencr.append(decoded_word) # Add decoded word with a space
             byte_accumulator=[]
     if(byte_accumulator):
-        dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace")) #Change number to word and add it to list
-    final_text="".join(dencr).strip() #Final formed word
-    print(final_text)'''
+        dencr.append(bytes(byte_accumulator).decode("utf-8", errors="replace"))
+    final_text="".join(dencr).strip() # Final formed text
+    print(final_text)
+    return final_text
 #==================================================================================
 #==================================================================================
 

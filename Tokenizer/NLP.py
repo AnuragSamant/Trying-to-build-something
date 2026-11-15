@@ -186,7 +186,6 @@ try:
     encode=Tokenizer.encoding(res,amer) #Encode the new data of user
     code=encode[0] #Tokenized id
     dictio=encode[1] #Dictionary of all merge
-    #decoder(code,dictio) #Decode the token id back to text
     eov=matrix(res) #Use Voacabulary to create 2D matrix
     eoo=user_e(code,eov) #Fetch needed embedding from all embeddings using token ID
     eou=positional_encoding(eoo) #Updating data position using its index and row. It will help to keep record of which data belong to which row or index.
@@ -198,7 +197,7 @@ try:
     final_l=final_layer(new_layer[2],res)
     soft=softmax(final_l)
     argmax=arg_deco(soft,eou,res)
-    print(argmax)
+    Tokenizer.decoder(argmax) #Decode the token id back to text
 except Exception as e:
     print(e)
     print("Something Went wrong.")
