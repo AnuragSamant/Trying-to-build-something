@@ -25,15 +25,29 @@ def positional_encoding(eoo):#Updating each row value by 0.01 to encode the valu
             eoo[i][j]+=i*0.01 
     return eoo
 
-def weights(res,input_d=128): #Weight matrix for user input based on last hidden layer
-    weight=[] #Empty weights
-    for i in range(input_d): #Row = Number of vocab col
-        col=[] #Col = Weights
-        for j in range(len(res)): #Vocb Size
-            ran_wei=random.random()-0.5 #Random weight
-            col.append(ran_wei) #Add value to each col
-        weight.append(col) #Add value to weight
-    return weight #Return weight matrix
+def self_att(eou): #Add knowledge of nearby words to other words.
+    dim=len(eou[0]) #Embedd size
+    w_query=hidden_weights(dim,dim) #Weight Query 
+    w_key=hidden_weights(dim,dim) #Weight Key
+    w_value=hidden_weights(dim,dim) #Weight Value
+    query=sum_layer(eou,w_query) #Query matrix  / Input Matrix
+    key=sum_layer(eou,w_key) #
+    value=sum_layer(eou,w_value)
+    keyt=[]
+    for i in range(dim):
+        dt=[]
+        for j in range(len(eou)):
+            dt.append(key[j][i])
+        keyt.append(dt)
+    att_score=sum_layer(query,keyt)             #MULTI-HEAD
+    scale=math.sqrt(dim)
+    scaled_scores=[]
+    for row in att_score:
+        scaled_row=[val / scale for val in row]
+        scaled_scores.append(scaled_row)
+    Scale_softmax=softmax(scaled_scores)
+    info_neigh=sum_layer(Scale_softmax,value)
+    return info_neigh
 
 def hidden_weights(row,col): #Weight matrix for Hidden layers
     weight=[]
@@ -100,7 +114,7 @@ def add_layer(initial,relu): #Adding multiple layers on top of each other
     return weight_history, activation_history, new_layer_res #Return the weight history and ReLU history
 
 def final_layer(new_layer_res,res): #Creating the final layer
-    vocab_weights=weights(res,len(new_layer_res[0])) # 128 x vocab_size or 512 x vocab_size to map back to words or weight matrix for final layer 
+    vocab_weights=hidden_weights(len(new_layer_res[0]),len(res)) # 128 x vocab_size or 512 x vocab_size to map back to words or weight matrix for final layer 
     f_o=[]
     for i in range(len(new_layer_res)): #Number of row in last hidden layer
         col_sum=[]
@@ -135,7 +149,10 @@ def arg_deco(soft,eou,res): #Use to create output layer
             if(soft[j][i]>max): #If new high probability save it and it's index
                 max=soft[j][i]
                 temp=i
-        p_w.append(res[temp]) #Add the value at that index from vocab
+        if temp < len(res):
+            p_w.append(res[temp])
+        else:
+            p_w.append("<unk>") #Add the value at that index from vocab
     return p_w #Return guessed word as token id
 
 try:
@@ -172,9 +189,10 @@ try:
     #decoder(code,dictio) #Decode the token id back to text
     eov=matrix(res) #Use Voacabulary to create 2D matrix
     eoo=user_e(code,eov) #Fetch needed embedding from all embeddings using token ID
-    eou=positional_encoding(eoo)
+    eou=positional_encoding(eoo) #Updating data position using its index and row. It will help to keep record of which data belong to which row or index.
+    att_eou=self_att(eou) #Self attention for user input
     initial=hidden_weights(128,128) #Createing weight matrix
-    sums=sum_layer(eou,initial) #Create a column sum matrix for each embedding
+    sums=sum_layer(att_eou,initial) #Create a column sum matrix for each embedding using self attention
     relu=ReLU(sums)
     new_layer=add_layer(initial,relu)
     final_l=final_layer(new_layer[2],res)
